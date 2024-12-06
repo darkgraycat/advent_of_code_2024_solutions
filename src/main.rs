@@ -6,5 +6,5 @@ mod day3;
 
 fn main() {
     let input = fs::read_to_string("src/day3/input.txt").expect("Cannot read file");
-    day3::solution::task1(input);
+    day3::solution::task2(input);
 }
