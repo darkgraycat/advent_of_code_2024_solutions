@@ -1,1 +1,1 @@
-pub mod task1;
+pub mod solution;
