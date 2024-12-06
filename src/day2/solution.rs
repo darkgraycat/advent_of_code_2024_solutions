@@ -18,6 +18,42 @@ pub fn task1(input: String) {
     println!("Result {}", num_of_safe_reports);
 }
 
+pub fn task2(input: String) {
+    let levels = parse(input);
+
+    let max_safe_difference = 3;
+    let mut num_of_safe_reports: u32 = 0;
+
+    for level in levels.iter() {
+        match check_level(&level, max_safe_difference) {
+            Some(idx) => {
+                let mut lvl_a = level.clone();
+                let mut lvl_b = level.clone();
+                lvl_a.remove(idx);
+                lvl_b.remove(idx - 1);
+                let check_lvl_a = check_level(&lvl_a, max_safe_difference);
+                let check_lvl_b = check_level(&lvl_b, max_safe_difference);
+
+                match (check_lvl_a, check_lvl_b) {
+                    (Some(_), Some(_)) => {
+                        println!("{:?} - UNSAFE", level);
+                    }
+                    _ => {
+                        println!("{:?} - SAFE", level);
+                        num_of_safe_reports += 1;
+                    }
+                }
+            }
+            None => {
+                println!("{:?} - SAFE", level);
+                num_of_safe_reports += 1;
+            }
+        }
+    }
+
+    println!("Result {}", num_of_safe_reports);
+}
+
 fn check_level(level: &Vec<u32>, max_difference: i32) -> Option<usize> {
     let is_increasing = level.first() < level.last();
     for (i, pair) in level.windows(2).enumerate() {
