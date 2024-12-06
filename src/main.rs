@@ -1,8 +1,9 @@
 use std::fs;
 
 mod day1;
+mod day2;
 
 fn main() {
-    let input = fs::read_to_string("src/day1/input_1.txt").expect("Cannot read file");
-    day1::solution::task2(input);
+    let input = fs::read_to_string("src/day2/test_input.txt").expect("Cannot read file");
+    day2::solution::task1(input);
 }
