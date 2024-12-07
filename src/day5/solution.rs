@@ -40,21 +40,42 @@ impl InputData {
         self.updates
             .iter()
             .filter(|update| {
-                update.windows(2).all(|pair| {
-                    let (bef, aft) = (pair[0], pair[1]);
-                    self.before
-                        .get(&bef)
-                        .map(|befores| befores.contains(&aft))
-                        .unwrap_or(false)
-                        && self
-                            .after
-                            .get(&aft)
-                            .map(|afters| afters.contains(&bef))
-                            .unwrap_or(false)
-                })
+                update
+                    .windows(2)
+                    .all(|pair| self.check_order(pair[0], pair[1]))
             })
             .cloned()
             .collect()
+    }
+
+    fn get_incorrect_updates(&self) -> Vec<Vec<u32>> {
+        self.updates
+            .iter()
+            .filter(|update| {
+                update
+                    .windows(2)
+                    .any(|pair| !self.check_order(pair[0], pair[1]))
+            })
+            .cloned()
+            .collect()
+    }
+
+    fn check_order(&self, before: u32, after: u32) -> bool {
+        self.is_allowed_after(before, after) && self.is_allowed_before(after, before)
+    }
+
+    fn is_allowed_after(&self, value: u32, after: u32) -> bool {
+        self.before
+            .get(&value)
+            .map(|befores| befores.contains(&after))
+            .unwrap_or(false)
+    }
+
+    fn is_allowed_before(&self, value: u32, before: u32) -> bool {
+        self.after
+            .get(&value)
+            .map(|afters| afters.contains(&before))
+            .unwrap_or(false)
     }
 }
 
@@ -71,4 +92,10 @@ pub fn task1(input: String) {
     println!("{:?}", results);
 }
 
-pub fn task2(input: String) {}
+pub fn task2(input: String) {
+    let input_data = InputData::parse(&input);
+
+    let incorrect_updates = input_data.get_incorrect_updates();
+
+    println!("{:?}", incorrect_updates);
+}
