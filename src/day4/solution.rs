@@ -1,3 +1,5 @@
+use regex::Regex;
+
 #[derive(Clone, Copy, Debug)]
 struct Vec2 {
     x: i32,
@@ -98,7 +100,64 @@ fn get_char_from_map(map: &Vec<Vec<char>>, point: &Vec2) -> Option<char> {
     }
 }
 
-pub fn task2(input: String) {}
+pub fn task2(input: String) {
+    // IT TOOK 22seconds to run on input.txt
+    let lines = input.lines().collect::<Vec<&str>>();
+
+    let re_validator = Regex::new(r"[MS].[MS]").unwrap();
+
+    let mut result = 0;
+
+    for (ln, line) in lines.iter().enumerate() {
+        for idx in 0..line.len() {
+            let Some(first3) = line.get(idx..idx + 3) else {
+                break;
+            };
+            if !re_validator.is_match(first3) {
+                continue;
+            }
+            let Some(next_line) = lines.get(ln + 1) else {
+                break;
+            };
+            let Some(last_line) = lines.get(ln + 2) else {
+                break;
+            };
+            let next3 = next_line.get(idx..idx + 3).unwrap();
+            let last3 = last_line.get(idx..idx + 3).unwrap();
+
+            if has_x_mas(first3, next3, last3) {
+                result += 1;
+            }
+        }
+    }
+
+    println!("Result - {}", result);
+}
+
+fn has_x_mas(line1: &str, line2: &str, line3: &str) -> bool {
+    // println!("Checking:\n{}\n{}\n{}\n", line1, line2, line3);
+    let re_center_a = Regex::new(r".A.").unwrap();
+    let re_m_m = Regex::new(r"M.M").unwrap();
+    let re_m_s = Regex::new(r"M.S").unwrap();
+    let re_s_m = Regex::new(r"S.M").unwrap();
+    let re_s_s = Regex::new(r"S.S").unwrap();
+    if !re_center_a.is_match(line2) {
+        return false;
+    };
+    if re_m_m.is_match(line1) && re_s_s.is_match(line3) {
+        return true;
+    }
+    if re_s_s.is_match(line1) && re_m_m.is_match(line3) {
+        return true;
+    }
+    if re_m_s.is_match(line1) && re_m_s.is_match(line3) {
+        return true;
+    }
+    if re_s_m.is_match(line1) && re_s_m.is_match(line3) {
+        return true;
+    }
+    return false;
+}
 
 fn parse(input: &String) -> Vec<Vec<char>> {
     input.lines().map(|line| line.chars().collect()).collect()
