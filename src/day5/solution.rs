@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::{cmp::Ordering, collections::HashMap};
 
 #[derive(Debug)]
 struct InputData {
@@ -26,10 +26,7 @@ impl InputData {
             })
             .collect::<Vec<Vec<u32>>>();
 
-        InputData {
-            order,
-            updates,
-        }
+        InputData { order, updates }
     }
 
     fn get_correct_updates(&self) -> Vec<Vec<u32>> {
@@ -80,29 +77,25 @@ pub fn task1(input: String) {
 pub fn task2(input: String) {
     let input_data = InputData::parse(&input);
 
-    println!("{:?}", input_data);
+    let mut incorrect_updates = input_data.get_incorrect_updates();
 
-    let incorrect_updates = input_data.get_incorrect_updates();
 
-    // 75,97,47,61,53 becomes 97,75,47,61,53.
-    // 61,13,29 becomes 61,29,13.
-    // 97,13,75,29,47 becomes 97,75,47,29,13.
-    // 97,75,29,13      13
-
-    let fixed_updated = incorrect_updates
-        .iter()
-        .map(|update| {
-            let mut current: usize = 0;
-            while current < update.len() {
-                println!("{}", update[current]);
-                current += 1;
+    incorrect_updates.iter_mut().for_each(|update| {
+        update.sort_by(|&a, &b| {
+            if input_data.check_order(a, b) {
+                Ordering::Less
+            } else {
+                Ordering::Greater
             }
-            return update;
-        })
-        .cloned()
-        .collect::<Vec<Vec<u32>>>();
+        });
+    });
 
-    println!("{:?}", fixed_updated);
+    let results: u32 = incorrect_updates
+        .iter()
+        .map(|update| update[update.len() / 2])
+        .sum();
+
+    println!("{:?}", results);
 }
 
 fn find_intersection(vec1: &Vec<u32>, vec2: &Vec<u32>) -> Vec<u32> {
