@@ -1,6 +1,6 @@
-use std::{collections::HashSet, fmt::Display};
+use std::collections::HashSet;
 
-#[derive(Debug, Eq, PartialEq, Clone, Copy)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash)]
 enum Direction {
     Up,
     Down,
@@ -25,7 +25,7 @@ impl TryFrom<char> for Direction {
 struct Guard {
     position: (i32, i32),
     direction: Direction,
-    visited: HashSet<(i32, i32)>,
+    visited: HashSet<(i32, i32, Direction)>,
 }
 
 impl Guard {
@@ -48,11 +48,11 @@ impl Guard {
             self.rotate_right();
             let (nx, ny) = self.get_next_step();
             self.position = (nx, ny);
-            self.visited.insert((nx, ny));
+            self.visited.insert((nx, ny, self.direction));
             return true;
         }
         
-        self.visited.insert((nx, ny));
+        self.visited.insert((nx, ny, self.direction));
         self.position = (nx, ny);
         true
     }
