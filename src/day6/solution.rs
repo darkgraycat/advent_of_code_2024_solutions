@@ -21,12 +21,21 @@ impl TryFrom<char> for Direction {
     }
 }
 
+#[derive(Debug)]
+struct Guard {
+    position: (usize, usize),
+    direction: Direction,
+}
+
 pub fn task1(input: String) {
     let (grid, (y, x), direction) = parse(&input);
 
-    let direction: Direction = direction.try_into().expect("No direction");
+    let guard = Guard{
+        position: (x, y),
+        direction: direction.try_into().expect("No diretion")
+    };
 
-    println!("{grid:?}\n{x}-{y}\n{direction:?}");
+    println!("{grid:?}\n{guard:?}");
 }
 
 pub fn task2(input: String) {}
