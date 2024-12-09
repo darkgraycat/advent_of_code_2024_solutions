@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Clone, Copy)]
 enum Direction {
     Up,
     Down,
@@ -8,63 +8,25 @@ enum Direction {
     Right,
 }
 
-impl Direction {
-    fn get_next(self) -> Self {
-        match self {
-            Direction::Up => Direction::Right,
-            Direction::Right => Direction::Down,
-            Direction::Down => Direction::Left,
-            Direction::Left => Direction::Up,
-        }
-    }
+pub fn task1(input: String) {
+    let (grid, (y, x), direction) = parse(&input);
 
-    fn coords(self) -> (i32, i32) {
-        match self {
-            Direction::Up => (0, -1),
-            Direction::Right => (1, 0),
-            Direction::Down => (0, 1),
-            Direction::Left => (-1, 0),
-        }
-    }
+    println!("{grid:?}\n{x}-{y}\n{direction}");
 }
-
-impl From<char> for Direction {
-    fn from(value: char) -> Self {
-        match value {
-            '^' => Direction::Up,
-            '>' => Direction::Right,
-            'v' => Direction::Down,
-            '<' => Direction::Left,
-            _ => panic!("Invalid direction"),
-        }
-    }
-}
-
-#[derive(PartialEq, Eq, Hash, Clone)]
-struct Vec2 {
-    x: i32,
-    y: i32,
-}
-
-impl Vec2 {
-    fn new(x: i32, y: i32) -> Self {
-        Vec2 { x, y }
-    }
-}
-
-struct Guard {
-    position: Vec2,
-    direction: Direction,
-}
-
-pub fn task1(input: String) {}
 
 pub fn task2(input: String) {}
 
-fn parse(input: &String) {
-    let cells: HashMap<Vec2, bool> = HashMap::new();
+fn parse(input: &String) -> (Vec<Vec<char>>, (usize, usize), char) {
+    let grid: Vec<Vec<char>> = input.lines().map(|line| line.chars().collect()).collect();
 
-
-    let guard_postions = input.find(pat)
-    // let guard =;
+    let guard = grid
+        .iter()
+        .enumerate()
+        .find_map(|(row, line)| {
+            line.iter()
+                .position(|&c| c == '^' || c == 'v' || c == '>' || c == '<')
+                .map(|col| (row, col, line[col]))
+        })
+        .expect("No guard found");
+    (grid, (guard.0, guard.1), guard.2)
 }
