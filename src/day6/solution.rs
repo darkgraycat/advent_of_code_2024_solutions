@@ -1,17 +1,32 @@
 use std::collections::HashMap;
 
-#[derive(Debug, PartialEq, Clone, Copy)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy)]
 enum Direction {
     Up,
     Down,
     Left,
     Right,
 }
+impl TryFrom<char> for Direction {
+    type Error = String;
+
+    fn try_from(ch: char) -> Result<Self, Self::Error> {
+        match ch {
+            '^' => Ok(Direction::Up),
+            'v' => Ok(Direction::Down),
+            '<' => Ok(Direction::Left),
+            '>' => Ok(Direction::Right),
+            _ => Err(format!("Cannot parse {}", ch)),
+        }
+    }
+}
 
 pub fn task1(input: String) {
     let (grid, (y, x), direction) = parse(&input);
 
-    println!("{grid:?}\n{x}-{y}\n{direction}");
+    let direction: Direction = direction.try_into().expect("No direction");
+
+    println!("{grid:?}\n{x}-{y}\n{direction:?}");
 }
 
 pub fn task2(input: String) {}
