@@ -36,17 +36,23 @@ impl Guard {
             visited: HashSet::new(),
         }
     }
+
     fn make_step(&mut self, map_grid: &MapGrid) -> bool {
         let (nx, ny) = self.get_next_step();
+
         if !map_grid.is_in_bounds((nx, ny)) {
             return false;
         }
+
         if map_grid.is_obstacle((nx, ny)) {
             self.rotate_right();
             let (nx, ny) = self.get_next_step();
             self.position = (nx, ny);
+            self.visited.insert((nx, ny));
             return true;
         }
+        
+        self.visited.insert((nx, ny));
         self.position = (nx, ny);
         true
     }
@@ -107,7 +113,6 @@ pub fn task1(input: String) {
 
     let mut steps = 0;
     loop {
-        println!("{guard:?} {steps}");
         let can_move_forward = guard.make_step(&map_grid);
         steps += 1;
         if !can_move_forward {
@@ -115,10 +120,11 @@ pub fn task1(input: String) {
         }
     }
 
-    println!("{map_grid:?}");
-    println!("{guard:?}");
+    // println!("{map_grid:?}");
+    // println!("{guard:?}");
 
     println!("Result {}", steps);
+    println!("Uniq steps {}", guard.visited.len());
 }
 
 pub fn task2(input: String) {}
