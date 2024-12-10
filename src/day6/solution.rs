@@ -1,4 +1,4 @@
-use std::collections::HashSet;
+use std::{collections::HashSet, fmt::Display};
 
 #[derive(Debug, Eq, PartialEq, Clone, Copy, Hash)]
 enum Direction {
@@ -51,7 +51,7 @@ impl Guard {
             self.visited.insert((nx, ny, self.direction));
             return true;
         }
-        
+
         self.visited.insert((nx, ny, self.direction));
         self.position = (nx, ny);
         true
@@ -98,6 +98,25 @@ impl MapGrid {
             .and_then(|row| row.get(x as usize))
             .map_or(false, |&cell| cell)
     }
+
+    fn place_obstacle(&mut self, (x, y): (i32, i32)) {
+        self.grid
+            .get_mut(y as usize)
+            .and_then(|row| row.get_mut(x as usize))
+            .map_or((), |cell| *cell = true)
+    }
+}
+
+impl Display for MapGrid {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        for row in &self.grid {
+            for &cell in row {
+                write!(f, "{}", if cell {'#'} else {'.'})?;
+            }
+            writeln!(f)?;
+        }
+        Ok(())
+    }
 }
 
 pub fn task1(input: String) {
@@ -123,7 +142,7 @@ pub fn task1(input: String) {
     // println!("{map_grid:?}");
     // println!("{guard:?}");
 
-    println!("Result {}", steps);
+    println!("MapGrid\n{}", map_grid);
     println!("Uniq steps {}", guard.visited.len());
 }
 
