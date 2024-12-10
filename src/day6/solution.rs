@@ -5,7 +5,7 @@ pub fn task1(input: String) {
 
     let mut guard = Guard::new((x, y), direction.try_into().expect("No direction"));
 
-    let map_grid = MapGrid::new(
+    let mut map_grid = MapGrid::new(
         grid.into_iter()
             .map(|line| line.into_iter().map(|ch| ch == '#').collect())
             .collect(),
@@ -23,6 +23,11 @@ pub fn task1(input: String) {
     // println!("{map_grid:?}");
     // println!("{guard:?}");
 
+    println!("MapGrid\n{}", map_grid);
+    map_grid.place_obstacle((0, 0));
+    map_grid.place_obstacle((1, 0));
+    map_grid.place_obstacle((0, 1));
+    map_grid.place_obstacle((1, 1));
     println!("MapGrid\n{}", map_grid);
     println!("Uniq steps {}", guard.visited.len());
 }
