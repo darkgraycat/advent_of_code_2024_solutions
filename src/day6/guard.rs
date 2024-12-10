@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 
-use super::{direction::Direction, map_grid::MapGrid};
+use super::direction::Direction;
 
 #[derive(Debug)]
 pub struct Guard {
@@ -18,43 +18,27 @@ impl Guard {
         }
     }
 
-    pub fn make_step(&mut self, map_grid: &MapGrid) -> bool {
+    pub fn make_step(&mut self) {
         let (nx, ny) = self.get_next_step();
 
-        if !map_grid.is_in_bounds((nx, ny)) {
-            return false;
-        }
-
-        if map_grid.is_obstacle((nx, ny)) {
-            self.rotate_right();
-            let (nx, ny) = self.get_next_step();
-            self.position = (nx, ny);
-            self.visited.insert((nx, ny, self.direction));
-            return true;
-        }
+        println!("Going to {}, {}", nx, ny);
 
         self.visited.insert((nx, ny, self.direction));
         self.position = (nx, ny);
-        true
     }
 
-    fn get_next_step(&self) -> (i32, i32) {
+    pub fn get_next_step(&self) -> (i32, i32) {
         let (x, y) = self.position;
-        let (dx, dy) = match self.direction {
-            Direction::Up => (0, -1),
-            Direction::Down => (0, 1),
-            Direction::Left => (-1, 0),
-            Direction::Right => (1, 0),
-        };
+        let (dx, dy) = self.direction.get_coords();
         (x + dx, y + dy)
     }
 
-    fn rotate_right(&mut self) {
-        match self.direction {
-            Direction::Up => self.direction = Direction::Right,
-            Direction::Right => self.direction = Direction::Down,
-            Direction::Down => self.direction = Direction::Left,
-            Direction::Left => self.direction = Direction::Up,
-        };
+    pub fn rotate_right(&mut self) {
+        self.direction = match self.direction {
+            Direction::Up => Direction::Right,
+            Direction::Right => Direction::Down,
+            Direction::Down => Direction::Left,
+            Direction::Left => Direction::Up,
+        }
     }
 }
