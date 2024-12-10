@@ -14,8 +14,6 @@ pub fn task1(input: String) {
     loop {
         let next_step = guard.get_next_step();
 
-        println!("Next step to {:?}", next_step);
-
         if !map_grid.is_in_bounds(next_step) {
             break;
         }
@@ -44,8 +42,6 @@ pub fn task2(input: String) {
 
     loop {
         let next_step = guard.get_next_step();
-
-        println!("Next step to {:?}", next_step);
 
         if !map_grid.is_in_bounds(next_step) {
             break;

@@ -21,8 +21,6 @@ impl Guard {
     pub fn make_step(&mut self) {
         let (nx, ny) = self.get_next_step();
 
-        println!("Going to {}, {}", nx, ny);
-
         self.visited.insert((nx, ny, self.direction));
         self.position = (nx, ny);
     }
