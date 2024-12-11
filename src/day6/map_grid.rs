@@ -21,12 +21,13 @@ impl MapGrid {
             .map_or(false, |&cell| cell)
     }
 
-    pub fn place_obstacle(&mut self, (x, y): (i32, i32)) {
+    pub fn set_obstacle(&mut self, (x, y): (i32, i32), state: bool) {
         self.grid
             .get_mut(y as usize)
             .and_then(|row| row.get_mut(x as usize))
-            .map_or((), |cell| *cell = true)
+            .map_or((), |cell| *cell = state)
     }
+
 }
 
 impl Display for MapGrid {

@@ -4,9 +4,9 @@ use super::direction::Direction;
 
 #[derive(Debug)]
 pub struct Guard {
-    position: (i32, i32),
-    direction: Direction,
-    pub visited: HashSet<(i32, i32, Direction)>,
+    pub position: (i32, i32),
+    pub direction: Direction,
+    pub visited: HashSet<((i32, i32), Direction)>,
 }
 
 impl Guard {
@@ -19,10 +19,10 @@ impl Guard {
     }
 
     pub fn make_step(&mut self) {
-        let (nx, ny) = self.get_next_step();
+        let next_step = self.get_next_step();
 
-        self.visited.insert((nx, ny, self.direction));
-        self.position = (nx, ny);
+        self.visited.insert((self.position, self.direction));
+        self.position = next_step;
     }
 
     pub fn get_next_step(&self) -> (i32, i32) {
@@ -31,12 +31,11 @@ impl Guard {
         (x + dx, y + dy)
     }
 
+    pub fn is_in_loop(&self) -> bool {
+        self.visited.contains(&(self.position, self.direction))
+    }
+
     pub fn rotate_right(&mut self) {
-        self.direction = match self.direction {
-            Direction::Up => Direction::Right,
-            Direction::Right => Direction::Down,
-            Direction::Down => Direction::Left,
-            Direction::Left => Direction::Up,
-        }
+        self.direction = self.direction.get_rotated_right();
     }
 }

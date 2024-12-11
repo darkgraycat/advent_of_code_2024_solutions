@@ -15,6 +15,15 @@ impl Direction {
             Direction::Right => (1, 0),
         }
     }
+
+    pub fn get_rotated_right(&self) -> Direction {
+        match self {
+            Direction::Up => Direction::Right,
+            Direction::Right => Direction::Down,
+            Direction::Left => Direction::Up,
+            Direction::Down => Direction::Left,
+        }
+    }
 }
 
 impl TryFrom<char> for Direction {
