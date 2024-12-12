@@ -39,6 +39,7 @@ enum SimulationResults {
 fn simulate(guard: &mut Guard, map_grid: &MapGrid) -> SimulationResults {
     // println!("Simulate for {:?} - {:?}", guard.position, guard.direction);
     loop {
+        // println!("BEF {:?}", guard.visited);
         let next_step = guard.get_next_step();
 
         if !map_grid.is_in_bounds(next_step) {
@@ -51,9 +52,19 @@ fn simulate(guard: &mut Guard, map_grid: &MapGrid) -> SimulationResults {
 
         if map_grid.is_obstacle(next_step) {
             guard.rotate_right();
+            if map_grid.is_obstacle(guard.get_next_step()) {
+                guard.rotate_right();
+                if map_grid.is_obstacle(guard.get_next_step()) {
+                    guard.rotate_right();
+                    if map_grid.is_obstacle(guard.get_next_step()) {
+                        guard.rotate_right();
+                    }
+                }
+            }
         }
 
         guard.make_step();
+        // println!("AFT {:?}", guard.visited);
         // println!("Made step to {:?} - {:?}", guard.position, guard.direction);
     }
 }
@@ -70,36 +81,46 @@ pub fn task2(input: String) {
     );
 
     let mut counter = 0;
-    let mut max_iterations = 100_000;
+    let mut max_iterations = 100_00;
 
     let start_time = Instant::now();
 
     loop {
-        let mut guard_sim = Guard::new(guard.position, guard.direction.get_rotated_right());
-        guard_sim.visited = guard.visited.clone();
+        let next_step = guard.get_next_step();
 
-        if let SimulationResults::InLoop = simulate(&mut guard_sim, &map_grid) {
-            counter += 1;
+        if map_grid.is_obstacle(next_step) {
+            guard.rotate_right();
+            if map_grid.is_obstacle(guard.get_next_step()) {
+                guard.rotate_right();
+                if map_grid.is_obstacle(guard.get_next_step()) {
+                    guard.rotate_right();
+                    if map_grid.is_obstacle(guard.get_next_step()) {
+                        guard.rotate_right();
+                    }
+                }
+            }
         }
 
-        let next_step = guard.get_next_step();
+        guard.make_step();
 
         if !map_grid.is_in_bounds(next_step) {
             break;
         }
 
-        if map_grid.is_obstacle(next_step) {
-            guard.rotate_right();
+        let mut guard_sim = guard.clone();
+        guard_sim.rotate_right();
+
+        if let SimulationResults::InLoop = simulate(&mut guard_sim, &map_grid) {
+            counter += 1;
         }
 
         max_iterations -= 1;
         if max_iterations <= 0 {
             break;
         }
-
-        guard.make_step();
     }
 
+    // old/incorrect solution - 1358
     println!("Time elapsed {:?}", start_time.elapsed());
     println!("Iterations {}", 100_000 - max_iterations);
     println!("Counter {}", counter);

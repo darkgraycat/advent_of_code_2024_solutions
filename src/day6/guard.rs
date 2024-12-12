@@ -2,7 +2,7 @@ use std::collections::HashSet;
 
 use super::direction::Direction;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Guard {
     pub position: (i32, i32),
     pub direction: Direction,
@@ -19,10 +19,8 @@ impl Guard {
     }
 
     pub fn make_step(&mut self) {
-        let next_step = self.get_next_step();
-
         self.visited.insert((self.position, self.direction));
-        self.position = next_step;
+        self.position = self.get_next_step();
     }
 
     pub fn get_next_step(&self) -> (i32, i32) {
