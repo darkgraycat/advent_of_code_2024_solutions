@@ -11,7 +11,7 @@ impl MapGrid {
     }
 
     pub fn is_in_bounds(&self, (x, y): (i32, i32)) -> bool {
-        y >= 0 && y < self.grid.len() as i32 && x >= 0 && x < self.grid[0].len() as i32
+        (0..self.grid.len() as i32).contains(&y) && (0..self.grid[0].len() as i32).contains(&x)
     }
 
     pub fn is_obstacle(&self, (x, y): (i32, i32)) -> bool {
@@ -26,7 +26,7 @@ impl Display for MapGrid {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         for row in &self.grid {
             for &cell in row {
-                write!(f, "{}", if cell {'#'} else {'.'})?;
+                write!(f, "{}", if cell { '#' } else { '.' })?;
             }
             writeln!(f)?;
         }
