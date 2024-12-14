@@ -3,15 +3,16 @@ use std::io::{stdin, Read};
 use super::{guard::Guard, map_grid::MapGrid};
 
 pub struct PathTracker<'a> {
-    pub map_grid: &'a MapGrid,
+    map_grid: &'a MapGrid,
+    label: String,
 }
 
 impl<'a> PathTracker<'a> {
-    pub fn new(map_grid: &'a MapGrid) -> Self {
-        Self { map_grid }
+    pub fn new(map_grid: &'a MapGrid, label: String) -> Self {
+        Self { map_grid, label }
     }
 
-    pub fn render(&self, guard: &Guard) {
+    pub fn render(&self, guard: &Guard) -> &Self {
         let (x, y) = guard.position;
         let mut lines: Vec<char> = self
             .map_grid
@@ -28,11 +29,13 @@ impl<'a> PathTracker<'a> {
             .collect::<Vec<_>>()
             .join("\n");
 
-        println!("{}\n", display);
+        println!("{}:\n{}", self.label, display);
+        self
     }
 
-    pub fn wait(&self) {
+    pub fn wait(&self) -> &Self {
         let mut buffer = [0; 1];
         stdin().read_exact(&mut buffer).unwrap();
+        self
     }
 }

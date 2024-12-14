@@ -38,7 +38,10 @@ enum SimulationResults {
 
 fn simulate(guard: &mut Guard, map_grid: &MapGrid) -> SimulationResults {
     // println!("Simulate for {:?} - {:?}", guard.position, guard.direction);
+    // let path_tracker = PathTracker::new(&map_grid, String::from("SIMULATION"));
     loop {
+        // path_tracker.render(&guard).wait();
+
         while map_grid.is_obstacle(guard.get_next_step()) {
             guard.rotate_right()
         }
@@ -46,13 +49,13 @@ fn simulate(guard: &mut Guard, map_grid: &MapGrid) -> SimulationResults {
         guard.make_step();
 
         if guard.is_in_loop() {
+            // println!("LOOP FOUND");
             return SimulationResults::InLoop;
         }
 
         if !map_grid.is_in_bounds(guard.position) {
             return SimulationResults::OutOfBounds;
         }
-        // println!("Made step to {:?} - {:?}", guard.position, guard.direction);
     }
 }
 
@@ -67,7 +70,7 @@ pub fn task2(input: String) {
             .collect(),
     );
 
-    let path_tracker = PathTracker::new(&map_grid);
+    // let path_tracker = PathTracker::new(&map_grid, String::from("MAIN"));
 
     let mut counter = 0;
     let mut max_iterations = 100_000;
@@ -75,18 +78,11 @@ pub fn task2(input: String) {
     let start_time = Instant::now();
 
     loop {
-        path_tracker.render(&guard);
-        path_tracker.wait();
-
         while map_grid.is_obstacle(guard.get_next_step()) {
             guard.rotate_right()
         }
 
-        guard.make_step();
-
-        if !map_grid.is_in_bounds(guard.position) {
-            break;
-        }
+        // path_tracker.render(&guard).wait();
 
         let mut guard_sim = guard.clone();
         guard_sim.rotate_right();
@@ -95,13 +91,20 @@ pub fn task2(input: String) {
             counter += 1;
         }
 
+        guard.make_step();
+
+        if !map_grid.is_in_bounds(guard.position) {
+            break;
+        }
+
         max_iterations -= 1;
         if max_iterations <= 0 {
             break;
         }
     }
 
-    // old/incorrect solutions - 1358, 1413, 1412
+    // old/incorrect solutions - 1358, 1413, 1412, 1438
+    // correct should be 1309
     println!("Time elapsed {:?}", start_time.elapsed());
     println!("Iterations {}", 100_000 - max_iterations);
     println!("Counter {}", counter);
