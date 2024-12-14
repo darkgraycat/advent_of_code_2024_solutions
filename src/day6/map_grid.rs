@@ -2,12 +2,18 @@ use std::fmt::Display;
 
 #[derive(Debug)]
 pub struct MapGrid {
-    grid: Vec<Vec<bool>>,
+    pub grid: Vec<Vec<bool>>,
+    pub width: usize,
+    pub height: usize,
 }
 
 impl MapGrid {
     pub fn new(grid: Vec<Vec<bool>>) -> Self {
-        MapGrid { grid }
+        MapGrid { 
+            height: grid.len(),
+            width: grid.last().unwrap().len(),
+            grid,
+        }
     }
 
     pub fn is_in_bounds(&self, (x, y): (i32, i32)) -> bool {

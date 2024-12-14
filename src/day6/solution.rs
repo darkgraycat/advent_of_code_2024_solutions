@@ -1,6 +1,6 @@
 use std::time::Instant;
 
-use crate::day6::{guard::Guard, map_grid::MapGrid};
+use crate::day6::{guard::Guard, map_grid::MapGrid, path_tracker::{self, PathTracker}};
 
 pub fn task1(input: String) {
     let (grid, (y, x), direction) = parse(&input);
@@ -43,15 +43,15 @@ fn simulate(guard: &mut Guard, map_grid: &MapGrid) -> SimulationResults {
             guard.rotate_right()
         }
 
-        if !map_grid.is_in_bounds(guard.get_next_step()) {
-            return SimulationResults::OutOfBounds;
-        }
+        guard.make_step();
 
         if guard.is_in_loop() {
             return SimulationResults::InLoop;
         }
 
-        guard.make_step();
+        if !map_grid.is_in_bounds(guard.position) {
+            return SimulationResults::OutOfBounds;
+        }
         // println!("Made step to {:?} - {:?}", guard.position, guard.direction);
     }
 }
@@ -67,27 +67,31 @@ pub fn task2(input: String) {
             .collect(),
     );
 
+    let path_tracker = PathTracker::new(&map_grid);
+
     let mut counter = 0;
     let mut max_iterations = 100_000;
 
     let start_time = Instant::now();
 
     loop {
+        path_tracker.render(&guard);
+        path_tracker.wait();
+
         while map_grid.is_obstacle(guard.get_next_step()) {
             guard.rotate_right()
         }
 
-        if !map_grid.is_in_bounds(guard.get_next_step()) {
+        guard.make_step();
+
+        if !map_grid.is_in_bounds(guard.position) {
             break;
         }
-
-        guard.make_step();
 
         let mut guard_sim = guard.clone();
         guard_sim.rotate_right();
 
         if let SimulationResults::InLoop = simulate(&mut guard_sim, &map_grid) {
-            // println!("LOOP");
             counter += 1;
         }
 

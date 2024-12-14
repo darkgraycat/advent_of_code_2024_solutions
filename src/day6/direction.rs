@@ -39,3 +39,14 @@ impl TryFrom<char> for Direction {
         }
     }
 }
+
+impl Into<char> for Direction {
+    fn into(self) -> char {
+        match self {
+            Direction::Up => '^',
+            Direction::Down => 'v',
+            Direction::Left => '<',
+            Direction::Right => '>',
+        }
+    }
+}

@@ -36,4 +36,9 @@ impl Guard {
     pub fn rotate_right(&mut self) {
         self.direction = self.direction.get_rotated_right();
     }
+
+    pub fn get_position_as_idx(&self, scanline: usize) -> usize {
+        let (x, y) = self.position;
+        scanline * y as usize + x as usize
+    }
 }
