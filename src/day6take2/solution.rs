@@ -1,7 +1,4 @@
-use std::{
-    collections::HashSet,
-    ops::Range,
-};
+use std::{collections::HashSet, ops::Range};
 
 #[derive(Debug, Clone, Copy, Hash, PartialEq, Eq)]
 enum Direction {
@@ -76,8 +73,10 @@ impl State {
             .contains(&(self.guard.position, self.guard.direction))
     }
 
-    fn make_step(&mut self) -> Option<()> { 
+    fn make_step(&mut self) -> Option<Position> {
         let next_position = self.get_next_position()?;
+
+        self.visited.insert((self.guard.position, self.guard.direction));
 
         if self.blocks.contains(&next_position) {
             self.guard.turn();
@@ -85,7 +84,7 @@ impl State {
             self.guard.forward();
         }
 
-        Some(())
+        Some(self.guard.position)
     }
 
     fn get_next_position(&self) -> Option<Position> {
@@ -137,6 +136,23 @@ impl TryFrom<String> for State {
 }
 
 pub fn task2(input: String) {
-    let state = State::try_from(input).expect("Pew pew");
-    println!("Initial state {:?}", state);
+    let mut state = State::try_from(input).expect("Pew pew");
+    let mut counter = 0;
+
+    /* main loop */
+    while let Some(next_position) = state.make_step() {
+        let mut simulation = state.with_block(next_position);
+
+        /* simulation loop */
+        while let Some(_) = simulation.make_step() {
+            if simulation.is_looping() {
+                counter += 1;
+                break;
+            }
+        }
+    }
+
+    println!("Result {}", counter);
+
+    // println!("Initial state {:?}", state);
 }
