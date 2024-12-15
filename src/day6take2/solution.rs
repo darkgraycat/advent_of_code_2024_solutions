@@ -69,23 +69,38 @@ struct State {
 
 impl State {
     fn is_looping(&self) -> bool {
-        self.visited
-            .contains(&(self.guard.position, self.guard.direction))
+        self.visited.contains(&(
+            self.guard.position.move_to(self.guard.direction),
+            self.guard.direction,
+        ))
     }
 
     fn make_step(&mut self) -> Option<Position> {
         let next_position = self.get_next_position()?;
-
-        self.visited
-            .insert((self.guard.position, self.guard.direction));
+        // println!("{:?}", self.visited);
 
         if self.blocks.contains(&next_position) {
+            if !self.visited.insert((next_position, self.guard.direction)) {
+                // println!("LOOOOOOooooooOOOOoooP");
+                return None;
+            }
             self.guard.turn();
         } else {
-            self.guard.forward();
+            self.guard.position = next_position;
         }
 
         Some(self.guard.position)
+
+        // self.visited
+        //     .insert((self.guard.position, self.guard.direction));
+
+        // if self.blocks.contains(&next_position) {
+        //     self.guard.turn();
+        // } else {
+        //     self.guard.forward();
+        // }
+
+        // Some(self.guard.position)
     }
 
     fn get_next_position(&self) -> Option<Position> {
@@ -96,7 +111,6 @@ impl State {
     fn with_block(&self, position: Position) -> State {
         let mut cloned = self.clone();
         cloned.blocks.insert(position);
-        cloned.visited.clear();
         cloned
     }
 }
@@ -184,7 +198,7 @@ pub fn task2(input: String) {
 
     /* main loop */
     loop {
-        println!("!MAIN\n{}", state);
+        // println!("!MAIN\n{}", state);
         // wait_input();
 
         if let Some(next_position) = state.get_next_position() {
@@ -192,12 +206,17 @@ pub fn task2(input: String) {
 
             state.make_step();
 
-            while let Some(_) = simulation.make_step() {
-                println!("!SIMULATION\n{}", simulation);
+            /* simulation loop */
+            loop {
+                // println!("!SIMULATION\n{}", simulation);
                 // wait_input();
-                if simulation.is_looping() {
-                    loops += 1;
-                    println!("!LOOP {}\n", loops);
+
+                if None == simulation.make_step() {
+                    // println!("Guard in - {:?}", simulation.guard);
+                    if simulation.is_looping() {
+                        // println!("LOOOOOOP");
+                        loops += 1;
+                    }
                     break;
                 }
             }
