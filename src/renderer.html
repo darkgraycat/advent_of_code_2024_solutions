@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Renderer</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+
+    #view {
+      border: 1px solid black;
+      display: block;
+      margin: 20px auto;
+    }
+
+    #info {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="info"></div>
+  <canvas id="view" width="800" height="600"></canvas>
+  <script>
+    const STATES = {
+      MAIN: 'MAIN',
+      SIMULATION: 'SIMULATION',
+      LOOP: 'LOOP',
+    };
+
+    const canvas = document.getElementById('view');
+    /** @type {RenderingContext} */
+    const ctx = canvas.getContext('2d');
+    const infoDiv = document.getElementById('info');
+
+    const render = ({ frames, currentState, loopCount }) => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Display info about the current state and loop count
+      infoDiv.textContent = `Current State: ${currentState} | Loops: ${loopCount || 0}`;
+
+      for (const [state, frame] of Object.entries(frames)) {
+        if (state == 'MAIN') {
+          // renderFrame(frame, 8, 'blue', 0, 0);
+        } else if (state == 'SIMULATION') {
+          renderFrame(frame, 4, 'red', 0, 0);
+        }
+      }
+    };
+
+    const renderFrame = (frame, size = 8, color = 'red', offsetX = 0, offsetY = 0) => {
+      // ctx.save();
+      // ctx.translate(offsetX, offsetY);
+      const grid = frame;
+      for (let y = 0; y < grid.length; y++) {
+        const row = grid[y];
+        for (let x = 0; x < row.length; x++) {
+          const ch = row[x];
+          if (ch == '.') continue;
+
+          if (ch == '#') {
+            ctx.fillStyle = 'black';
+          } else if (ch == '-' || ch == '|') {
+            ctx.fillStyle = 'gray';
+          } else if (ch == '^' || ch == 'v' || ch == '<' || ch == '>') {
+            ctx.fillStyle = color;
+          }
+          // console.log(x * size, y * size, ch);
+          ctx.fillRect(x * size, y * size, size, size);
+        }
+      }
+      // ctx.restore();
+    }
+
+
+
+    const socket = new WebSocket('ws://localhost:8080');
+
+    socket.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      // console.log(data);
+      render(data);
+    };
+
+    socket.onopen = () => console.log('Connected to WebSocket server');
+    socket.onclose = () => console.log('Disconnected from WebSocket server');
+  </script>
+</body>
+
+</html>

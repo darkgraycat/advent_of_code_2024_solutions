@@ -1,4 +1,4 @@
-use std::{collections::HashSet, ops::Range};
+use std::{collections::HashSet, fmt::Display, ops::Range};
 
 #[derive(Debug, Clone, Copy, Hash, PartialEq, Eq)]
 enum Direction {
@@ -76,7 +76,8 @@ impl State {
     fn make_step(&mut self) -> Option<Position> {
         let next_position = self.get_next_position()?;
 
-        self.visited.insert((self.guard.position, self.guard.direction));
+        self.visited
+            .insert((self.guard.position, self.guard.direction));
 
         if self.blocks.contains(&next_position) {
             self.guard.turn();
@@ -92,9 +93,10 @@ impl State {
         (self.x_range.contains(&next.x) && self.y_range.contains(&next.y)).then_some(next)
     }
 
-    fn with_block(&self, position: Position) -> Self {
+    fn with_block(&self, position: Position) -> State {
         let mut cloned = self.clone();
         cloned.blocks.insert(position);
+        cloned.visited.clear();
         cloned
     }
 }
@@ -135,24 +137,76 @@ impl TryFrom<String> for State {
     }
 }
 
+impl Display for State {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        for y in self.y_range.clone() {
+            for x in self.x_range.clone() {
+                let pos = Position { x, y };
+
+                // Check if the guard is at this position
+                if self.guard.position == pos {
+                    let guard_char = match self.guard.direction {
+                        Direction::Up => '^',
+                        Direction::Down => 'v',
+                        Direction::Left => '<',
+                        Direction::Right => '>',
+                    };
+                    write!(f, "{}", guard_char)?;
+                } else if self.blocks.contains(&pos) {
+                    write!(f, "#")?;
+                } else if let Some((_, _)) = self.visited.get(&(pos, Direction::Up)) {
+                    write!(f, "|")?;
+                } else if let Some((_, _)) = self.visited.get(&(pos, Direction::Down)) {
+                    write!(f, "|")?;
+                } else if let Some((_, _)) = self.visited.get(&(pos, Direction::Left)) {
+                    write!(f, "-")?;
+                } else if let Some((_, _)) = self.visited.get(&(pos, Direction::Right)) {
+                    write!(f, "-")?;
+                } else {
+                    // Empty space
+                    write!(f, ".")?;
+                }
+            }
+            writeln!(f)?; // Newline after each row
+        }
+        Ok(())
+    }
+}
+
+pub fn wait_input() {
+    let mut buffer = [0; 1];
+    std::io::Read::read_exact(&mut std::io::stdin(), &mut buffer).unwrap();
+}
+
 pub fn task2(input: String) {
     let mut state = State::try_from(input).expect("Pew pew");
-    let mut counter = 0;
+    let mut loops = 0;
 
     /* main loop */
-    while let Some(next_position) = state.make_step() {
-        let mut simulation = state.with_block(next_position);
+    loop {
+        println!("!MAIN\n{}", state);
+        // wait_input();
 
-        /* simulation loop */
-        while let Some(_) = simulation.make_step() {
-            if simulation.is_looping() {
-                counter += 1;
-                break;
+        if let Some(next_position) = state.get_next_position() {
+            let mut simulation = state.with_block(next_position);
+
+            state.make_step();
+
+            while let Some(_) = simulation.make_step() {
+                println!("!SIMULATION\n{}", simulation);
+                // wait_input();
+                if simulation.is_looping() {
+                    loops += 1;
+                    println!("!LOOP {}\n", loops);
+                    break;
+                }
             }
+        } else {
+            break;
         }
     }
 
-    println!("Result {}", counter);
+    println!("Result {}", loops);
 
     // println!("Initial state {:?}", state);
 }

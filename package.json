@@ -1,0 +1,15 @@
+{
+  "name": "advent_of_code_2024_solutions",
+  "version": "1.0.0",
+  "description": "Solutions for https://adventofcode.com/2024",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start_day6_2": "cargo run -r | node src/renderer.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "ws": "^8.18.0"
+  }
+}
