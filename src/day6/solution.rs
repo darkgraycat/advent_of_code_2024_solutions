@@ -73,7 +73,6 @@ pub fn task2(input: String) {
     // let path_tracker = PathTracker::new(&map_grid, String::from("MAIN"));
 
     let mut counter = 0;
-    let mut max_iterations = 100_000;
 
     let start_time = Instant::now();
 
@@ -81,6 +80,8 @@ pub fn task2(input: String) {
         while map_grid.is_obstacle(guard.get_next_step()) {
             guard.rotate_right()
         }
+
+        guard.make_step();
 
         // path_tracker.render(&guard).wait();
 
@@ -91,14 +92,8 @@ pub fn task2(input: String) {
             counter += 1;
         }
 
-        guard.make_step();
 
         if !map_grid.is_in_bounds(guard.position) {
-            break;
-        }
-
-        max_iterations -= 1;
-        if max_iterations <= 0 {
             break;
         }
     }
@@ -106,7 +101,6 @@ pub fn task2(input: String) {
     // old/incorrect solutions - 1358, 1413, 1412, 1438
     // correct should be 1309
     println!("Time elapsed {:?}", start_time.elapsed());
-    println!("Iterations {}", 100_000 - max_iterations);
     println!("Counter {}", counter);
     println!("Uniq steps {}", guard.visited.len());
 }

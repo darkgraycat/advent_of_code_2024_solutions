@@ -6,9 +6,10 @@ mod day3;
 mod day4;
 mod day5;
 mod day6;
+mod day6take2;
 
 fn main() {
-    let input = fs::read_to_string("src/day6/input.txt").expect("Cannot read file");
-    // let input = fs::read_to_string("src/day6/test_input.txt").expect("Cannot read file");
-    day6::solution::task2(input);
+    // let input = fs::read_to_string("src/day6/input.txt").expect("Cannot read file");
+    let input = fs::read_to_string("src/day6/test_input.txt").expect("Cannot read file");
+    day6take2::solution::task2(input);
 }
