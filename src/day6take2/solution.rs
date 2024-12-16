@@ -1,3 +1,11 @@
+/*
+* Completelly messed up here, as with previos solutions
+* But finally know the reason:
+* "You cannot place obstacle on visited cell"
+* Thank you pal from the comments on Reddit:
+* https://www.reddit.com/r/adventofcode/comments/1hb9odk/2024_day_6_part_2_one_extra_solution_but_it_seems/
+*/
+
 use std::{collections::HashSet, fmt::Display, ops::Range};
 
 #[derive(Debug, Clone, Copy, Hash, PartialEq, Eq)]
@@ -75,6 +83,10 @@ impl State {
         ))
     }
 
+    fn would_loop(&self, pos: &Position, dir: &Direction) -> bool {
+        self.visited.contains(&(*pos, *dir))
+    }
+
     fn make_step(&mut self) -> Option<Position> {
         let next_position = self.get_next_position()?;
         // println!("{:?}", self.visited);
@@ -111,7 +123,15 @@ impl State {
     fn with_block(&self, position: Position) -> State {
         let mut cloned = self.clone();
         cloned.blocks.insert(position);
+        cloned.visited.clear();
         cloned
+    }
+
+    fn print_visited(&self) -> String {
+        self.visited
+            .iter()
+            .map(|(pos, dir)| format!("{}:{} - {:?}, ", pos.x, pos.y, dir))
+            .collect()
     }
 }
 
@@ -198,29 +218,62 @@ pub fn task2(input: String) {
 
     let mut loopsSet: HashSet<(Position)> = HashSet::new();
 
+    let mut print_flag = true;
+
     /* main loop */
     loop {
-        // println!("!MAIN\n{}", state);
-        // wait_input();
+        if print_flag {
+            println!("!MAIN\n{}", state);
+            wait_input();
+        }
 
         if let Some(next_position) = state.get_next_position() {
+            println!("----------------------------------");
             let mut simulation = state.with_block(next_position);
+            println!("setting block at {:?}", next_position);
+            println!("{:?}", simulation.guard);
+
+            if next_position.x == 3 && next_position.y == 3 {
+                print_flag = true;
+            }
 
             state.make_step();
 
             /* simulation loop */
             loop {
-                // println!("!SIMULATION\n{}", simulation);
-                // wait_input();
+                // if print_flag {
+                //     println!("!SIMULATION\n{}", simulation);
+                //     wait_input();
+                // }
 
                 if None == simulation.make_step() {
+                    // if print_flag {
+                    //     println!(
+                    //         "Step to {} {} - {:?}\nVisited blocks {}",
+                    //         simulation.guard.position.x,
+                    //         simulation.guard.position.y,
+                    //         simulation.guard.direction,
+                    //         simulation.print_visited(),
+                    //     );
+                    // }
                     // println!("Guard in - {:?}", simulation.guard);
                     if simulation.is_looping() {
                         loopsSet.insert(next_position);
-                        // println!("LOOOOOOP");
+                        println!("-------LOOP-------");
+                        println!("visited {}", simulation.print_visited());
                         loops += 1;
                     }
                     break;
+                } else {
+                    // if print_flag {
+                    //     println!(
+                    //         "Step to {} {} - {:?}\nVisited blocks {}",
+                    //         simulation.guard.position.x,
+                    //         simulation.guard.position.y,
+                    //         simulation.guard.direction,
+                    //         simulation.print_visited(),
+                    //     );
+                    // }
                 }
             }
         } else {
@@ -228,8 +281,11 @@ pub fn task2(input: String) {
         }
     }
 
+    // println!("{:?}", loopsSet);
+
     println!("Result {}", loops);
     println!("Res 2 {}", loopsSet.len());
 
+    // (5, 3) (3, 6) (6, 8) (7, 3) (2, 3) (0, 3)
     // println!("Initial state {:?}", state);
 }
