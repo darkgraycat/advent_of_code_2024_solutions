@@ -8,8 +8,6 @@
 
 use std::{collections::HashSet, ops::Range};
 
-
-
 ////////////////////////////////////////////////////////////////////////////////
 /// Direction
 ////////////////////////////////////////////////////////////////////////////////
@@ -47,8 +45,6 @@ impl TryFrom<char> for Direction {
     }
 }
 
-
-
 ////////////////////////////////////////////////////////////////////////////////
 /// Position
 ////////////////////////////////////////////////////////////////////////////////
@@ -74,8 +70,6 @@ impl Position {
     }
 }
 
-
-
 ////////////////////////////////////////////////////////////////////////////////
 /// Guard
 ////////////////////////////////////////////////////////////////////////////////
@@ -97,8 +91,6 @@ impl Guard {
         self.position = self.get_next();
     }
 }
-
-
 
 ////////////////////////////////////////////////////////////////////////////////
 /// State
@@ -184,8 +176,6 @@ impl TryFrom<String> for State {
     }
 }
 
-
-
 ////////////////////////////////////////////////////////////////////////////////
 /// Solution
 ////////////////////////////////////////////////////////////////////////////////
@@ -194,25 +184,25 @@ pub fn task2(input: String) {
     let mut state = State::try_from(input).expect("Pew pew");
     let mut loops = 0;
 
+    let mut tries: HashSet<Position> = HashSet::new();
+
     /* main loop */
-    loop {
-        if let Some(next_position) = state.get_next_position() {
-            let mut simulation = state.with_block(next_position);
-
+    while let Some(next_position) = state.get_next_position() {
+        if tries.contains(&next_position) {
             state.make_step();
-
-            /* simulation loop */
-            loop {
-                if None == simulation.make_step() {
-                    if simulation.is_looping() {
-                        loops += 1;
-                    }
-                    break;
-                }
-            }
-        } else {
-            break;
+            continue;
         }
+
+        let mut simulation = state.with_block(next_position);
+        tries.insert(next_position);
+
+        /* simulation loop */
+        while let Some(_) = simulation.make_step() {}
+        if simulation.is_looping() {
+            loops += 1;
+        }
+
+        state.make_step();
     }
 
     println!("Result {}", loops);
