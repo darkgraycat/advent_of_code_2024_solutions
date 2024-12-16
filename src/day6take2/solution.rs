@@ -196,6 +196,8 @@ pub fn task2(input: String) {
     let mut state = State::try_from(input).expect("Pew pew");
     let mut loops = 0;
 
+    let mut loopsSet: HashSet<(Position)> = HashSet::new();
+
     /* main loop */
     loop {
         // println!("!MAIN\n{}", state);
@@ -214,6 +216,7 @@ pub fn task2(input: String) {
                 if None == simulation.make_step() {
                     // println!("Guard in - {:?}", simulation.guard);
                     if simulation.is_looping() {
+                        loopsSet.insert(next_position);
                         // println!("LOOOOOOP");
                         loops += 1;
                     }
@@ -226,6 +229,7 @@ pub fn task2(input: String) {
     }
 
     println!("Result {}", loops);
+    println!("Res 2 {}", loopsSet.len());
 
     // println!("Initial state {:?}", state);
 }
