@@ -40,8 +40,15 @@ impl Position {
         }
     }
 
-    fn diff(&self, position: &Position) -> Position {
-        Position { x: position.x - self.x, y: position.y - self.y }
+    fn delta(&self, position: &Position) -> Position {
+        Position {
+            x: position.x.abs_diff(self.x),
+            y: position.y.abs_diff(self.y),
+        }
+    }
+
+    fn concat(&self, position: &Position) -> Position {
+        Position { x: position.x + self.x, y: position.y + self.y }
     }
 }
 

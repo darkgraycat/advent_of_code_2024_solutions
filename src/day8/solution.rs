@@ -7,10 +7,16 @@ use std::{
 use crate::Position;
 
 pub fn task1(input: String) {
-    let network = AerialsNetwork::try_from(input).expect("Oops");
+    let vv = vec![Position::new(10, 5), Position::new(8, 5), Position::new(1, 4)];
 
-    println!("DEBUG PRINT:");
-    println!("{:?}", network);
+    let pos = Position::new(1, 4);
+    let contains = vv.contains(&pos);
+
+    println!("Contains: {}", contains);
+
+    let mut network = AerialsNetwork::try_from(input).expect("Oops");
+
+    network.collect_antinodes();
 
     println!("\n\nDISPLAY PRINT:");
     println!("{}", network);
@@ -29,18 +35,67 @@ struct AerialsNetwork {
 }
 
 impl AerialsNetwork {
-    fn collect_antinodes(&mut self) {}
+    fn collect_antinodes(&mut self) {
+        self.antinodes.clear();
+        for (kind, aerials) in self.aerials.iter() {
+            println!("{} ----------------", kind);
+            for (i, pos_a) in aerials.iter().enumerate() {
+                for pos_b in aerials.iter().skip(i + 1) {
+                    println!("Comparing {:?} with {:?}", pos_a, pos_b);
+                    let node_a = pos_a.delta(pos_b);
+                    let node_b = pos_b.delta(pos_a);
+
+                    if self.in_range(&node_a) && self.get_aerial_kind(&node_a).map_or(true, |k| *kind != k) {
+                        self.antinodes.insert(node_a);
+                    }
+
+                    if self.in_range(&node_b) && self.get_aerial_kind(&node_b).map_or(true, |k| *kind != k) {
+                        self.antinodes.insert(node_b);
+                    }
+                }
+            }
+        }
+    }
+
+    fn in_range(&self, position: &Position) -> bool {
+        self.x_range.contains(&position.x) && self.y_range.contains(&position.y)
+    }
+
+    fn get_aerial_kind(&self, position: &Position) -> Option<char> {
+        self.aerials
+            .iter()
+            .find_map(|(kind, aerials)| aerials.contains(position).then(|| *kind))
+    }
 }
 
 impl Display for AerialsNetwork {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        writeln!(f, "Network {:?} x {:?}", self.x_range, self.y_range)?;
-        for a in &self.aerials {
-            writeln!(f, "{:?}", a)?
+        let (max_x, max_y) = (self.x_range.end, self.y_range.end);
+        // let mut grid: Vec<char> = format!("{}\n", ".".repeat(max_x).repeat(max_y)).chars().collect();
+
+        let mut grid: Vec<char> = ".".repeat(max_x * max_y).chars().collect();
+
+        writeln!(f, "Network:\t{} x {}", max_x, max_y)?;
+
+        for (kind, aerials) in self.aerials.iter() {
+            writeln!(f, "Aerials: \t{} {:?}", kind, aerials)?;
+            for Position { x, y } in aerials {
+                grid[max_x * y + x] = *kind;
+            }
         }
-        for n in &self.antinodes {
-            writeln!(f, "{:?}", n)?
+        for antinode in self.antinodes.iter() {
+            grid[max_x * antinode.y + antinode.x] = '#';
+            writeln!(f, "Antinode:\t{:?}", antinode)?;
         }
+
+        let display = grid
+            .chunks(max_x)
+            .map(|c| c.iter().collect::<String>())
+            .collect::<Vec<_>>()
+            .join("\n");
+
+        writeln!(f, "Grid:\n{}", display)?;
+
         Ok(())
     }
 }

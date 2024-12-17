@@ -24,7 +24,6 @@ impl TryFrom<char> for Direction {
     }
 }
 
-
 #[derive(Debug, Clone, Copy)]
 struct Guard {
     position: Position,
@@ -43,7 +42,6 @@ impl Guard {
     }
 }
 
-
 #[derive(Debug, Clone)]
 struct State {
     guard: Guard,
@@ -55,10 +53,8 @@ struct State {
 
 impl State {
     fn is_looping(&self) -> bool {
-        self.visited.contains(&(
-            self.guard.position.moved(self.guard.direction),
-            self.guard.direction,
-        ))
+        self.visited
+            .contains(&(self.guard.position.moved(self.guard.direction), self.guard.direction))
     }
 
     fn make_step(&mut self) -> Option<Position> {
@@ -92,26 +88,17 @@ impl TryFrom<String> for State {
     type Error = String;
 
     fn try_from(value: String) -> Result<Self, Self::Error> {
-        let guard_idx = value
-            .find(|c| "<>v^".contains(c))
-            .ok_or("No Guard found!")?;
+        let guard_idx = value.find(|c| "<>v^".contains(c)).ok_or("No Guard found!")?;
         let scanline = value.lines().next().ok_or("Grid cannot be oneline")?.len() + 1;
 
         let guard = Guard {
             position: Position::new(guard_idx % scanline, guard_idx / scanline),
-            direction: value
-                .chars()
-                .nth(guard_idx)
-                .ok_or("Cannot get direction")?
-                .try_into()?,
+            direction: value.chars().nth(guard_idx).ok_or("Cannot get direction")?.try_into()?,
         };
 
         let blocks: HashSet<Position> = value
             .match_indices('#')
-            .map(|(index, _)| Position {
-                x: index % scanline,
-                y: index / scanline,
-            })
+            .map(|(index, _)| Position { x: index % scanline, y: index / scanline })
             .collect();
 
         Ok(State {
