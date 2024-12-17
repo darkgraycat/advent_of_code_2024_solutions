@@ -64,9 +64,7 @@ pub fn task2(input: String) {
 }
 
 fn parse(input: String, re: &Regex) -> Vec<String> {
-    re.captures_iter(input.as_str())
-        .map(|cap| cap[0].to_string())
-        .collect()
+    re.captures_iter(input.as_str()).map(|cap| cap[0].to_string()).collect()
 }
 
 fn extract(instruction: &str, re: &Regex) -> Option<(i32, i32)> {

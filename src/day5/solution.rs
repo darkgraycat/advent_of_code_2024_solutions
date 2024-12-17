@@ -32,11 +32,7 @@ impl InputData {
     fn get_correct_updates(&self) -> Vec<Vec<u32>> {
         self.updates
             .iter()
-            .filter(|update| {
-                update
-                    .windows(2)
-                    .all(|pair| self.check_order(pair[0], pair[1]))
-            })
+            .filter(|update| update.windows(2).all(|pair| self.check_order(pair[0], pair[1])))
             .cloned()
             .collect()
     }
@@ -44,20 +40,13 @@ impl InputData {
     fn get_incorrect_updates(&self) -> Vec<Vec<u32>> {
         self.updates
             .iter()
-            .filter(|update| {
-                update
-                    .windows(2)
-                    .any(|pair| !self.check_order(pair[0], pair[1]))
-            })
+            .filter(|update| update.windows(2).any(|pair| !self.check_order(pair[0], pair[1])))
             .cloned()
             .collect()
     }
 
     fn check_order(&self, value: u32, after: u32) -> bool {
-        self.order
-            .get(&value)
-            .map(|befores| befores.contains(&after))
-            .unwrap_or(false)
+        self.order.get(&value).map(|befores| befores.contains(&after)).unwrap_or(false)
     }
 }
 
@@ -66,10 +55,7 @@ pub fn task1(input: String) {
 
     let correct_updates = input_data.get_correct_updates();
 
-    let results: u32 = correct_updates
-        .iter()
-        .map(|update| update[update.len() / 2])
-        .sum();
+    let results: u32 = correct_updates.iter().map(|update| update[update.len() / 2]).sum();
 
     println!("{:?}", results);
 }
@@ -79,21 +65,11 @@ pub fn task2(input: String) {
 
     let mut incorrect_updates = input_data.get_incorrect_updates();
 
-
     incorrect_updates.iter_mut().for_each(|update| {
-        update.sort_by(|&a, &b| {
-            if input_data.check_order(a, b) {
-                Ordering::Less
-            } else {
-                Ordering::Greater
-            }
-        });
+        update.sort_by(|&a, &b| if input_data.check_order(a, b) { Ordering::Less } else { Ordering::Greater });
     });
 
-    let results: u32 = incorrect_updates
-        .iter()
-        .map(|update| update[update.len() / 2])
-        .sum();
+    let results: u32 = incorrect_updates.iter().map(|update| update[update.len() / 2]).sum();
 
     println!("{:?}", results);
 }

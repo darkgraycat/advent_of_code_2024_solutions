@@ -14,12 +14,7 @@ impl<'a> PathTracker<'a> {
 
     pub fn render(&self, guard: &Guard) -> &Self {
         let (x, y) = guard.position;
-        let mut lines: Vec<char> = self
-            .map_grid
-            .to_string()
-            .replace("\n", "")
-            .chars()
-            .collect();
+        let mut lines: Vec<char> = self.map_grid.to_string().replace("\n", "").chars().collect();
 
         lines[self.map_grid.width * y as usize + x as usize] = guard.direction.into();
 

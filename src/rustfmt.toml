@@ -8,3 +8,6 @@ single_line_if_else_max_width = 80
 single_line_let_else_max_width = 80
 enum_discrim_align_threshold = 80
 struct_field_align_threshold = 80
+brace_style = "PreferSameLine"
+control_brace_style = "AlwaysSameLine"
+use_small_heuristics = "Max"

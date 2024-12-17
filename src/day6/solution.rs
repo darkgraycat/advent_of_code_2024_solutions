@@ -1,6 +1,10 @@
 use std::time::Instant;
 
-use crate::day6::{guard::Guard, map_grid::MapGrid, path_tracker::{self, PathTracker}};
+use crate::day6::{
+    guard::Guard,
+    map_grid::MapGrid,
+    path_tracker::{self, PathTracker},
+};
 
 pub fn task1(input: String) {
     let (grid, (y, x), direction) = parse(&input);
@@ -91,7 +95,6 @@ pub fn task2(input: String) {
         if let SimulationResults::InLoop = simulate(&mut guard_sim, &map_grid) {
             counter += 1;
         }
-
 
         if !map_grid.is_in_bounds(guard.position) {
             break;

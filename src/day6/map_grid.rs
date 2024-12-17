@@ -9,11 +9,7 @@ pub struct MapGrid {
 
 impl MapGrid {
     pub fn new(grid: Vec<Vec<bool>>) -> Self {
-        MapGrid { 
-            height: grid.len(),
-            width: grid.last().unwrap().len(),
-            grid,
-        }
+        MapGrid { height: grid.len(), width: grid.last().unwrap().len(), grid }
     }
 
     pub fn is_in_bounds(&self, (x, y): (i32, i32)) -> bool {

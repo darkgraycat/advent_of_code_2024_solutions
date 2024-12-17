@@ -11,11 +11,7 @@ pub struct Guard {
 
 impl Guard {
     pub fn new(position: (i32, i32), direction: Direction) -> Self {
-        Guard {
-            position,
-            direction,
-            visited: HashSet::new(),
-        }
+        Guard { position, direction, visited: HashSet::new() }
     }
 
     pub fn make_step(&mut self) {

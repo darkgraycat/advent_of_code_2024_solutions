@@ -11,10 +11,7 @@ pub fn task1(input: String) {
         .map(|calibration| Calibrator::new(calibration, operators.clone()))
         .collect();
 
-    let calibrated: Vec<i64> = calibrators
-        .iter()
-        .filter_map(|calibrator| calibrator.calibrate())
-        .collect();
+    let calibrated: Vec<i64> = calibrators.iter().filter_map(|calibrator| calibrator.calibrate()).collect();
 
     println!("{:?}", calibrated.iter().sum::<i64>());
 }
@@ -32,10 +29,7 @@ pub fn task2(input: String) {
         .map(|calibration| Calibrator::new(calibration, operators.clone()))
         .collect();
 
-    let calibrated: Vec<i64> = calibrators
-        .iter()
-        .filter_map(|calibrator| calibrator.calibrate())
-        .collect();
+    let calibrated: Vec<i64> = calibrators.iter().filter_map(|calibrator| calibrator.calibrate()).collect();
 
     println!("{:?}", calibrated.iter().sum::<i64>());
 }
@@ -54,10 +48,7 @@ impl TryFrom<String> for Calibration {
 
         Ok(Calibration {
             test_value: test_value.parse().expect("Parsing error"),
-            values: values
-                .split_whitespace()
-                .filter_map(|v| v.parse().ok())
-                .collect(),
+            values: values.split_whitespace().filter_map(|v| v.parse().ok()).collect(),
         })
     }
 }
@@ -100,10 +91,7 @@ impl Calibrator {
                         .collect()
                 })
                 .collect();
-        Self {
-            calibration,
-            combinations: operations,
-        }
+        Self { calibration, combinations: operations }
     }
 
     fn calibrate(&self) -> Option<i64> {
