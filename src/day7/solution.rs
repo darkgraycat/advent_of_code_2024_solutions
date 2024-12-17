@@ -117,7 +117,7 @@ impl Calibrator {
                     *a = match &ops[idx] {
                         Operation::Add => *a + b,
                         Operation::Multiply => *a * b,
-                        Operation::Concat => (*a * 10) + b,
+                        Operation::Concat => format!("{}{}", a, b).parse().unwrap(),
                     };
                     Some(*a)
                 })
