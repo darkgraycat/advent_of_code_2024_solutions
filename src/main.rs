@@ -17,7 +17,6 @@ fn main() {
     day8::solution::task1(input);
 }
 
-
 ////////////////////////////////////////////////////////////////////////////////
 /// Position
 ////////////////////////////////////////////////////////////////////////////////
@@ -39,6 +38,10 @@ impl Position {
             Direction::Down => Self { x: self.x, y: self.y + 1 },
             Direction::Left => Self { x: self.x - 1, y: self.y },
         }
+    }
+
+    fn diff(&self, position: &Position) -> Position {
+        Position { x: position.x - self.x, y: position.y - self.y }
     }
 }
 
