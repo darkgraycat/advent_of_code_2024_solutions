@@ -12,7 +12,7 @@ mod day8;
 
 fn main() {
     let input = fs::read_to_string("src/day8/input.txt").expect("Cannot read file");
-    // let input = fs::read_to_string("src/day8/test_input.txt").expect("Cannot read file");
+    let input = fs::read_to_string("src/day8/test_input.txt").expect("Cannot read file");
 
     day8::solution::task1(input);
 }
