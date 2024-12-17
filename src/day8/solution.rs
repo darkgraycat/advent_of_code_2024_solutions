@@ -20,6 +20,8 @@ pub fn task1(input: String) {
 
     println!("\n\nDISPLAY PRINT:");
     println!("{}", network);
+
+    println!("Total antinodes {}", network.antinodes.len());
 }
 
 pub fn task2(input: String) {
@@ -42,23 +44,35 @@ impl AerialsNetwork {
             for (i, pos_a) in aerials.iter().enumerate() {
                 for pos_b in aerials.iter().skip(i + 1) {
                     println!("Comparing {:?} with {:?}", pos_a, pos_b);
-                    let node_a = pos_a.delta(pos_b);
-                    let node_b = pos_b.delta(pos_a);
+                    let (dx, dy) = pos_a.delta(pos_b);
 
-                    if self.in_range(&node_a) && self.get_aerial_kind(&node_a).map_or(true, |k| *kind != k) {
-                        self.antinodes.insert(node_a);
+                    let node_a = (pos_a.x as i32 + dx, pos_a.y as i32 + dy);
+                    let node_b = (pos_b.x as i32 - dx, pos_b.y as i32 - dy);
+
+                    if self.in_range(node_a) {
+                        let node_a = Position { x: node_a.0 as usize, y: node_a.1 as usize };
+                        // println!("IN range A {:?}", node_a);
+                        if self.get_aerial_kind(&node_a).map_or(true, |k| *kind != k) {
+                            self.antinodes.insert(node_a);
+                        }
                     }
-
-                    if self.in_range(&node_b) && self.get_aerial_kind(&node_b).map_or(true, |k| *kind != k) {
-                        self.antinodes.insert(node_b);
+                    if self.in_range(node_b) {
+                        // println!("IN range B {:?}", node_b);
+                        let node_b = Position { x: node_b.0 as usize, y: node_b.1 as usize };
+                        if self.get_aerial_kind(&node_b).map_or(true, |k| *kind != k) {
+                            self.antinodes.insert(node_b);
+                        }
                     }
                 }
             }
         }
     }
 
-    fn in_range(&self, position: &Position) -> bool {
-        self.x_range.contains(&position.x) && self.y_range.contains(&position.y)
+    fn in_range(&self, (x, y): (i32, i32)) -> bool {
+        if x < 0 || y < 0 {
+            return false;
+        }
+        self.x_range.contains(&(x as usize)) && self.y_range.contains(&(y as usize))
     }
 
     fn get_aerial_kind(&self, position: &Position) -> Option<char> {
@@ -71,8 +85,6 @@ impl AerialsNetwork {
 impl Display for AerialsNetwork {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let (max_x, max_y) = (self.x_range.end, self.y_range.end);
-        // let mut grid: Vec<char> = format!("{}\n", ".".repeat(max_x).repeat(max_y)).chars().collect();
-
         let mut grid: Vec<char> = ".".repeat(max_x * max_y).chars().collect();
 
         writeln!(f, "Network:\t{} x {}", max_x, max_y)?;

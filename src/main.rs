@@ -11,8 +11,9 @@ mod day7;
 mod day8;
 
 fn main() {
-    let input = fs::read_to_string("src/day8/input.txt").expect("Cannot read file");
-    let input = fs::read_to_string("src/day8/test_input.txt").expect("Cannot read file");
+    let fname = "src/day8/test_input2.txt";
+    let fname = "src/day8/input.txt";
+    let input = fs::read_to_string(fname).expect("Cannot read file");
 
     day8::solution::task1(input);
 }
@@ -40,15 +41,29 @@ impl Position {
         }
     }
 
-    fn delta(&self, position: &Position) -> Position {
+    fn abs_diff(&self, position: &Position) -> Position {
         Position {
-            x: position.x.abs_diff(self.x),
-            y: position.y.abs_diff(self.y),
+            x: self.x.abs_diff(position.x),
+            y: self.y.abs_diff(position.y),
         }
     }
 
-    fn concat(&self, position: &Position) -> Position {
-        Position { x: position.x + self.x, y: position.y + self.y }
+    fn delta(&self, position: &Position) -> (i32, i32) {
+        (self.x as i32 - position.x as i32, self.y as i32 - position.y as i32)
+    }
+
+    fn add(&self, position: &Position) -> Option<Position> {
+        Some(Position {
+            x: self.x.checked_add(position.x)?,
+            y: self.y.checked_add(position.y)?,
+        })
+    }
+
+    fn sub(&self, position: &Position) -> Option<Position> {
+        Some(Position {
+            x: self.x.checked_sub(position.x)?,
+            y: self.y.checked_sub(position.y)?,
+        })
     }
 }
 
