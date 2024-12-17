@@ -8,28 +8,7 @@
 
 use std::{collections::HashSet, ops::Range};
 
-////////////////////////////////////////////////////////////////////////////////
-/// Direction
-////////////////////////////////////////////////////////////////////////////////
-
-#[derive(Debug, Clone, Copy, Hash, PartialEq, Eq)]
-enum Direction {
-    Up,
-    Right,
-    Down,
-    Left,
-}
-
-impl Direction {
-    fn turn_right(&self) -> Direction {
-        match self {
-            Direction::Up => Direction::Right,
-            Direction::Right => Direction::Down,
-            Direction::Down => Direction::Left,
-            Direction::Left => Direction::Up,
-        }
-    }
-}
+use crate::{Direction, Position};
 
 impl TryFrom<char> for Direction {
     type Error = String;
@@ -45,34 +24,6 @@ impl TryFrom<char> for Direction {
     }
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Position
-////////////////////////////////////////////////////////////////////////////////
-
-#[derive(Debug, Clone, Copy, Hash, PartialEq, Eq)]
-struct Position {
-    x: usize,
-    y: usize,
-}
-
-impl Position {
-    fn new(x: usize, y: usize) -> Self {
-        Self { x, y }
-    }
-
-    fn moved(&self, direction: Direction) -> Position {
-        match direction {
-            Direction::Up => Position::new(self.x, self.y - 1),
-            Direction::Right => Position::new(self.x + 1, self.y),
-            Direction::Down => Position::new(self.x, self.y + 1),
-            Direction::Left => Position::new(self.x - 1, self.y),
-        }
-    }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Guard
-////////////////////////////////////////////////////////////////////////////////
 
 #[derive(Debug, Clone, Copy)]
 struct Guard {
@@ -92,9 +43,6 @@ impl Guard {
     }
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// State
-////////////////////////////////////////////////////////////////////////////////
 
 #[derive(Debug, Clone)]
 struct State {
