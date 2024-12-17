@@ -1,3 +1,7 @@
-pub fn task1(input: String) {}
+pub fn task1(input: String) {
+    todo!()
+}
 
-pub fn task2(input: String) {}
+pub fn task2(input: String) {
+    todo!()
+}
