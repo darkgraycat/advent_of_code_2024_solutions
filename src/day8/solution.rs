@@ -7,13 +7,6 @@ use std::{
 use crate::Position;
 
 pub fn task1(input: String) {
-    let vv = vec![Position::new(10, 5), Position::new(8, 5), Position::new(1, 4)];
-
-    let pos = Position::new(1, 4);
-    let contains = vv.contains(&pos);
-
-    println!("Contains: {}", contains);
-
     let mut network = AerialsNetwork::try_from(input).expect("Oops");
 
     network.collect_antinodes();
@@ -31,7 +24,7 @@ pub fn task2(input: String) {
 #[derive(Debug)]
 struct AerialsNetwork {
     aerials: HashMap<char, Vec<Position>>,
-    antinodes: HashSet<Position>,
+    antinodes: HashSet<(char, Position)>,
     x_range: Range<usize>,
     y_range: Range<usize>,
 }
@@ -41,31 +34,57 @@ impl AerialsNetwork {
         self.antinodes.clear();
         for (kind, aerials) in self.aerials.iter() {
             println!("{} ----------------", kind);
-            for (i, pos_a) in aerials.iter().enumerate() {
-                for pos_b in aerials.iter().skip(i + 1) {
-                    println!("Comparing {:?} with {:?}", pos_a, pos_b);
-                    let (dx, dy) = pos_a.delta(pos_b);
+            for (i, aerial_a) in aerials.iter().enumerate() {
+                for aerial_b in aerials.iter().skip(i + 1) {
+                    println!("Comparing {:?} with {:?}", aerial_a, aerial_b);
 
-                    let node_a = (pos_a.x as i32 + dx, pos_a.y as i32 + dy);
-                    let node_b = (pos_b.x as i32 - dx, pos_b.y as i32 - dy);
-
-                    if self.in_range(node_a) {
-                        let node_a = Position { x: node_a.0 as usize, y: node_a.1 as usize };
-                        // println!("IN range A {:?}", node_a);
-                        if self.get_aerial_kind(&node_a).map_or(true, |k| *kind != k) {
-                            self.antinodes.insert(node_a);
-                        }
-                    }
-                    if self.in_range(node_b) {
-                        // println!("IN range B {:?}", node_b);
-                        let node_b = Position { x: node_b.0 as usize, y: node_b.1 as usize };
-                        if self.get_aerial_kind(&node_b).map_or(true, |k| *kind != k) {
-                            self.antinodes.insert(node_b);
-                        }
+                    for pos in self.calc_antinode_pair(*kind, aerial_a, aerial_b) {
+                        self.antinodes.insert((*kind, pos));
                     }
                 }
             }
         }
+    }
+
+    fn calc_antinode_pair(&self, kind: char, aerial_a: &Position, aerial_b: &Position) -> Vec<Position> {
+        let mut antinode_positions = Vec::new();
+        let (mut dx, mut dy) = aerial_a.delta(aerial_b);
+
+        let mut is_straight = false;
+
+        if dx == 0 || dy == 0 || dx.abs() == dy.abs() {
+            dx = dx.signum().abs();
+            dy = dy.signum().abs();
+            is_straight = true;
+        }
+
+        let mut pos_a = (aerial_a.x as i32, aerial_a.y as i32);
+        let mut pos_b = (aerial_b.x as i32, aerial_b.y as i32);
+
+        loop {
+            pos_a = (pos_a.0 + dx, pos_a.1 + dy);
+            pos_b = (pos_b.0 - dx, pos_b.1 - dy);
+
+            if self.in_range(pos_a) {
+                let pos = Position { x: pos_a.0 as usize, y: pos_a.1 as usize };
+                if is_straight || self.get_aerial_kind(&pos).map_or(true, |k| kind != k) {
+                    antinode_positions.push(pos);
+                }
+            }
+
+            if self.in_range(pos_b) {
+                let pos = Position { x: pos_b.0 as usize, y: pos_b.1 as usize };
+                if is_straight || self.get_aerial_kind(&pos).map_or(true, |k| kind != k) {
+                    antinode_positions.push(pos);
+                }
+            }
+
+            if !self.in_range(pos_a) && !self.in_range(pos_b) {
+                break;
+            }
+        }
+
+        antinode_positions
     }
 
     fn in_range(&self, (x, y): (i32, i32)) -> bool {
@@ -89,15 +108,17 @@ impl Display for AerialsNetwork {
 
         writeln!(f, "Network:\t{} x {}", max_x, max_y)?;
 
+        for antinode in self.antinodes.iter() {
+            let (_, pos) = antinode;
+            grid[max_x * pos.y + pos.x] = '#';
+            writeln!(f, "Antinode:\t{:?}", antinode)?;
+        }
+
         for (kind, aerials) in self.aerials.iter() {
             writeln!(f, "Aerials: \t{} {:?}", kind, aerials)?;
             for Position { x, y } in aerials {
                 grid[max_x * y + x] = *kind;
             }
-        }
-        for antinode in self.antinodes.iter() {
-            grid[max_x * antinode.y + antinode.x] = '#';
-            writeln!(f, "Antinode:\t{:?}", antinode)?;
         }
 
         let display = grid

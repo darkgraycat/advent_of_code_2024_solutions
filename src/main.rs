@@ -11,8 +11,8 @@ mod day7;
 mod day8;
 
 fn main() {
-    let fname = "src/day8/test_input2.txt";
-    let fname = "src/day8/input.txt";
+    let fname = "src/day8/test_input.txt";
+    // let fname = "src/day8/input.txt";
     let input = fs::read_to_string(fname).expect("Cannot read file");
 
     day8::solution::task1(input);
